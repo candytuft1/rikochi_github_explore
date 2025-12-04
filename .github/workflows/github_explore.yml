@@ -26,7 +26,7 @@ jobs:
 
       - name: Run rikochi_github_explore
         env:
-          GH_API_TOKEN: ${{ secrets.GITHUB_API_TOKEN }}   # ← ここを GH_API_TOKEN に
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}   # ← ここを GH_API_TOKEN に
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
