@@ -1,2 +1,4 @@
 crewAIInc/crewAI
 khoj-ai/khoj
+Fosowl/agenticSeek
+TransformerOptimus/SuperAGI
