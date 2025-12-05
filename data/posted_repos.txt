@@ -1,0 +1,2 @@
+crewAIInc/crewAI
+khoj-ai/khoj
