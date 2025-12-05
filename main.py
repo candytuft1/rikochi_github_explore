@@ -129,6 +129,27 @@ def send_to_discord(content: str):
 
 
 # =========================
+# 履歴管理
+# =========================
+
+DATA_DIR = "data"
+HISTORY_FILE = os.path.join(DATA_DIR, "posted_repos.txt")
+
+def load_posted_repos() -> set[str]:
+    """過去に投稿したリポジトリのリストを読み込む"""
+    if not os.path.exists(HISTORY_FILE):
+        return set()
+    with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+        return set(line.strip() for line in f if line.strip())
+
+def save_posted_repo(full_name: str):
+    """投稿したリポジトリを履歴に追記"""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(HISTORY_FILE, "a", encoding="utf-8") as f:
+        f.write(full_name + "\n")
+
+
+# =========================
 # メイン処理
 # =========================
 
@@ -137,17 +158,34 @@ def main():
     query = "autonomous agent language:Python stars:>200"
     print(f"GitHub 検索クエリ: {query}\n")
 
+    # 履歴読み込み
+    posted_repos = load_posted_repos()
+    print(f"過去に投稿済み: {len(posted_repos)} 件")
+
     # 取得件数は多めでもOK（ただし要約するのは TOP_N 件だけ）
-    repos = search_repos(query, per_page=5)
+    repos = search_repos(query, per_page=10)  # 重複除外を見越して少し多めに取得
+
+    # 未投稿のものだけ抽出
+    new_repos = [r for r in repos if r["full_name"] not in posted_repos]
+
+    if not new_repos:
+        print("新しいリポジトリが見つかりませんでした。")
+        return
+
+    print(f"新規候補: {len(new_repos)} 件")
 
     # 上位 TOP_N 件だけ要約
-    for rank, repo in enumerate(repos[:TOP_N], start=1):
+    count = 0
+    for repo in new_repos:
+        if count >= TOP_N:
+            break
+
         full_name = repo["full_name"]          # owner/repo
         stars = repo["stargazers_count"]
         desc = repo["description"] or ""
         url = repo["html_url"]
 
-        print(f"\n=== {rank}. {full_name} ===")
+        print(f"\n=== {count + 1}. {full_name} ===")
 
         readme = fetch_readme(*full_name.split("/"))
         if not readme:
@@ -158,7 +196,7 @@ def main():
         print("要約:\n", summary)
 
         message = textwrap.dedent(f"""
-        🏅 ランク {rank}
+        🏅 ランク {count + 1}
 
         📘 **{full_name}**
         ⭐ Stars: {stars}
@@ -172,6 +210,10 @@ def main():
         """).strip()
 
         send_to_discord(message)
+        
+        # 履歴に保存
+        save_posted_repo(full_name)
+        count += 1
 
 
 if __name__ == "__main__":
