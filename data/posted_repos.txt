@@ -2,3 +2,5 @@ crewAIInc/crewAI
 khoj-ai/khoj
 Fosowl/agenticSeek
 TransformerOptimus/SuperAGI
+agent0ai/agent-zero
+OpenBMB/XAgent
