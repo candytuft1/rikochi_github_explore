@@ -4,3 +4,5 @@ Fosowl/agenticSeek
 TransformerOptimus/SuperAGI
 agent0ai/agent-zero
 OpenBMB/XAgent
+aiwaves-cn/agents
+SamuelSchmidgall/AgentLaboratory
